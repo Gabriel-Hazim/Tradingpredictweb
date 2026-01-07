@@ -1,0 +1,2 @@
+# Tradingpredictweb
+Estimaciones de ganancia
