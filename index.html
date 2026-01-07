@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kodiak Trading & Proyección</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #e0e0e0; padding: 15px; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 15px; border: 1px solid #333; max-width: 400px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h2 { color: #f3ba2f; text-align: center; margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #888; font-size: 0.8em; margin-bottom: 20px; }
+        label { display: block; margin: 12px 0 5px; font-size: 0.85em; color: #bbb; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #2b2b2b; color: #fff; box-sizing: border-box; font-size: 1em; }
+        input:focus { border-color: #f3ba2f; outline: none; }
+        .btn { background: #f3ba2f; color: #000; padding: 15px; border: none; border-radius: 8px; width: 100%; margin-top: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:active { transform: scale(0.98); }
+        .result { margin-top: 20px; padding: 15px; background: #252525; border-left: 4px solid #f3ba2f; border-radius: 8px; display: none; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95em; }
+        .highlight { color: #f3ba2f; font-weight: bold; }
+        .danger { color: #ff5252; font-weight: bold; }
+        .success { color: #4caf50; font-weight: bold; }
+        hr { border: 0; border-top: 1px solid #333; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🦁 Kodiak Analytix</h2>
+    <p class="subtitle">Gestión de Riesgo & Proyección de Ganancias</p>
+    
+    <label>Capital a invertir (USD):</label>
+    <input type="number" id="capital" placeholder="Ej: 50" value="50">
+    
+    <label>Precio de Entrada (USD):</label>
+    <input type="number" id="precioEntrada" step="0.0001" placeholder="Ej: 1.05">
+    
+    <label>Precio Objetivo / Salida (USD):</label>
+    <input type="number" id="precioSalida" step="0.0001" placeholder="Ej: 1.50">
+    
+    <button class="btn" onclick="calcular()">ANALIZAR OPERACIÓN</button>
+
+    <div id="res" class="result">
+        <div class="row"><span>Posición (2x):</span> <span id="pTotal" class="highlight"></span></div>
+        <div class="row"><span>Liq. Estimada:</span> <span id="pLiq" class="danger"></span></div>
+        <hr>
+        <div class="row"><span>Ganancia Bruta:</span> <span id="ganancia" class="success"></span></div>
+        <div class="row"><span>Retorno (ROI):</span> <span id="roi" class="success"></span></div>
+        <div class="row"><span>Capital Final:</span> <span id="capFinal" class="highlight"></span></div>
+        <hr>
+        <p style="font-size: 0.75em; color: #777; margin: 0;">* Comisiones de Bybit ya descontadas (aprox. 0.12%).</p>
+    </div>
+</div>
+
+<script>
+function calcular() {
+    let cap = parseFloat(document.getElementById('capital').value);
+    let pEntrada = parseFloat(document.getElementById('precioEntrada').value);
+    let pSalida = parseFloat(document.getElementById('precioSalida').value);
+    
+    if(!cap || !pEntrada || !pSalida) {
+        alert("Gabriel, rellena todos los campos para el análisis.");
+        return;
+    }
+
+    let leverage = 2;
+    let comision = 0.0012; // 0.06% entrar y 0.06% salir
+    
+    // Cálculos
+    let posicionTotal = cap * leverage;
+    let liquidacion = pEntrada * (1 - (1 / leverage));
+    
+    // Variación del precio
+    let variacion = (pSalida - pEntrada) / pEntrada;
+    let gananciaBruta = posicionTotal * variacion;
+    let costoComisiones = posicionTotal * comision;
+    let gananciaNeta = gananciaBruta - costoComisiones;
+    let roi = (gananciaNeta / cap) * 100;
+    let capitalFinal = cap + gananciaNeta;
+
+    // Mostrar resultados
+    document.getElementById('pTotal').innerText = "$" + posicionTotal.toFixed(2);
+    document.getElementById('pLiq').innerText = "$" + liquidacion.toFixed(4);
+    document.getElementById('ganancia').innerText = "+$" + gananciaNeta.toFixed(2);
+    document.getElementById('roi').innerText = roi.toFixed(2) + "%";
+    document.getElementById('capFinal').innerText = "$" + capitalFinal.toFixed(2);
+    
+    document.getElementById('res').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
